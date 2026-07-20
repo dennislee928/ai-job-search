@@ -1,0 +1,13 @@
+{
+  "name": "ai-job-search-workspace",
+  "version": "1.0.0",
+  "workspace": [
+    "./frontend",
+    "./backend/api-gateway"
+  ],
+  "tasks": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:gateway": "cd backend/api-gateway && go run main.go",
+    "dev": "deno task dev:frontend & deno task dev:gateway"
+  }
+}
