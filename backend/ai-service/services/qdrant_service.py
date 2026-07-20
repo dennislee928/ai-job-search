@@ -1,4 +1,6 @@
+# pyrefly: ignore [missing-import]
 from qdrant_client import QdrantClient
+# pyrefly: ignore [missing-import]
 from qdrant_client.http.models import PointStruct, VectorParams, Distance
 from core.config import settings
 from services.embeddings import embeddings_service

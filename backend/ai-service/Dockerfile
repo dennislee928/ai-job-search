@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install uv for dependency management
 RUN pip install uv
 
-# Copy project specification
-COPY pyproject.toml .
+# Copy project specification and README
+COPY pyproject.toml README.md ./
 
 # Install dependencies into the system environment
 RUN uv pip install --system -e .
