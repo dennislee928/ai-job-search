@@ -69,6 +69,65 @@ services:
     networks:
       - app_network
     restart: unless-stopped
+  # Application Services
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://admin:admin@postgres:5432/ai_job_search?sslmode=disable
+      PORT: 8080
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  ai-service:
+    build:
+      context: ./backend/ai-service
+    ports:
+      - "8000:8000"
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: http://minio:9000
+    depends_on:
+      - qdrant
+      - redis
+      - minio
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  data-service:
+    build:
+      context: ./backend/data-service
+    ports:
+      - "8001:8001"
+    environment:
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: admin1234
+    depends_on:
+      - neo4j
+    networks:
+      - app_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    networks:
+      - app_network
+    restart: unless-stopped
 
 volumes:
   postgres_data:

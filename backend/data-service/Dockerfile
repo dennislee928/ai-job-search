@@ -2,11 +2,8 @@ FROM julia:1.10
 
 WORKDIR /app
 
-# Copy Project.toml and Manifest.toml if they exist
-COPY Project.toml Manifest.toml* ./
-
-# Instantiate the environment
-RUN julia --project=. -e 'import Pkg; Pkg.instantiate(); Pkg.precompile()'
+# Install dependencies dynamically to generate a valid Project.toml
+RUN julia --project=. -e 'import Pkg; Pkg.add(["Oxygen", "HTTP", "JSON3"]); Pkg.precompile()'
 
 COPY . .
 

@@ -6,6 +6,8 @@ import (
 	_ "api-gateway/docs" // Required for Swagger
 	"api-gateway/internal/config"
 	"api-gateway/internal/routes"
+	"api-gateway/internal/db"
+	"api-gateway/internal/auth"
 )
 
 // @title AI Job Search API Gateway
@@ -16,6 +18,16 @@ import (
 func main() {
 	cfg := config.LoadConfig()
 	
+	// Initialize GORM Database
+	if err := db.InitGORM(cfg.DatabaseURL); err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+
+	// Initialize Casbin RBAC
+	if err := auth.InitCasbin(); err != nil {
+		log.Fatalf("Failed to initialize Casbin: %v", err)
+	}
+
 	r := routes.SetupRouter()
 
 	log.Printf("Starting API Gateway on port %s", cfg.ServerPort)

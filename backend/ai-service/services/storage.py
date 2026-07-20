@@ -39,4 +39,12 @@ class MinioStorageService:
             print(f"Upload failed: {e}")
             return None
 
+    def upload_file_object(self, file_obj, bucket_name: str, object_name: str):
+        try:
+            self.s3_client.upload_fileobj(file_obj, bucket_name, object_name)
+            return f"{self.endpoint}/{bucket_name}/{object_name}"
+        except ClientError as e:
+            print(f"Upload failed: {e}")
+            return None
+
 storage_service = MinioStorageService()

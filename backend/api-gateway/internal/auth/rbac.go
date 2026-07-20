@@ -3,25 +3,19 @@ package auth
 import (
 	"log"
 
+	"api-gateway/internal/db"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 var Enforcer *casbin.Enforcer
 
-// InitCasbin connects to PostgreSQL via GORM and initializes Casbin policies.
-func InitCasbin(dbUrl string) error {
-	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{})
-	if err != nil {
-		return err
-	}
-
+// InitCasbin uses the global PostgreSQL DB via GORM and initializes Casbin policies.
+func InitCasbin() error {
 	// Initialize gorm adapter
-	adapter, err := gormadapter.NewAdapterByDB(db)
+	adapter, err := gormadapter.NewAdapterByDB(db.DB)
 	if err != nil {
 		return err
 	}

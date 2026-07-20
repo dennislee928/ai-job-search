@@ -9,7 +9,17 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
+	gormpostgres "gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
+
+var DB *gorm.DB
+
+func InitGORM(dbUrl string) error {
+	var err error
+	DB, err = gorm.Open(gormpostgres.Open(dbUrl), &gorm.Config{})
+	return err
+}
 
 func RunMigrations(dbUrl string, migrationsPath string) error {
 	db, err := sql.Open("postgres", dbUrl)
