@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -26,7 +27,7 @@ func InitCasbin(dbUrl string) error {
 	}
 
 	// The model defines how policies are structured (subject, object, action)
-	m := casbin.NewModel()
+	m := model.NewModel()
 	m.AddDef("r", "r", "sub, obj, act")
 	m.AddDef("p", "p", "sub, obj, act")
 	m.AddDef("g", "g", "_, _")
