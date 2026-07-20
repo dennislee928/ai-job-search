@@ -14,7 +14,7 @@ RUN pip install uv
 COPY pyproject.toml README.md ./
 
 # Install dependencies into the system environment
-RUN uv pip install --system -e .
+RUN uv pip install --system -r pyproject.toml
 RUN uv pip install --system boto3
 
 COPY . .
