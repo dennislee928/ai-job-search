@@ -4,7 +4,7 @@ framework_version: 1.0.0
 
 # Agent Guidelines: AI Job Search
 
-This workspace is structured to manage job search activities, scraper tools, CVs, cover letters, and interview preparation.
+This workspace is a polyglot microservice platform (Go API Gateway, Python FastAPI AI Service, Julia Data Service, Next.js Frontend) structured to manage job search activities, scraper tools, CVs, cover letters, and interview preparation.
 
 ## Thin-Pointer Design (Single Source of Truth)
 
@@ -17,3 +17,6 @@ To prevent duplication and configuration drift across different AI agent framewo
    - Do not duplicate these rules or specifications. Treat `.claude/` files as the single source of truth.
 3. **Portal Search Skills:**
    - Job-portal search CLIs live under [.agents/skills/](.agents/skills/) in the portable Agent Skills format (with a `SKILL.md` per portal). Codex and Antigravity discover these automatically; the `/scrape` workflow in [.claude/skills/job-scraper/](.claude/skills/job-scraper/) orchestrates them.
+4. **Infrastructure & Testing:**
+   - The `docker-compose.yml` file is the sole source of truth for the system's runtime architecture. Do not attempt to run services natively on the host machine.
+   - The `tests/robot/` directory is the sole source of truth for End-to-End API validation. When modifying backend services, run `robot api_tests.robot` to verify.

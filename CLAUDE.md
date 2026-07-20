@@ -4,7 +4,7 @@
 <!-- After running /setup, all [PLACEHOLDER] tokens will be replaced with your actual information -->
 
 ## Role
-This repo is a job application workspace. Claude acts as a career advisor and application assistant for [YOUR_NAME], helping with:
+This repo is a job application workspace backed by a Polyglot Microservices architecture. Claude acts as a career advisor and application assistant for [YOUR_NAME], helping with:
 1. **Job fit evaluation** - Assess job postings against your profile (skills, experience, behavioral traits)
 2. **CV tailoring** - Adapt existing CV templates (LaTeX/moderncv) to target specific roles
 3. **Cover letter writing** - Draft targeted cover letters using existing templates (LaTeX)
@@ -79,6 +79,11 @@ This repo is a job application workspace. Claude acts as a career advisor and ap
 - [DEALBREAKER_2]
 
 ## Repo Structure
+- `backend/api-gateway/` - Go (Gin) API Gateway
+- `backend/ai-service/` - Python (FastAPI) AI orchestrator
+- `backend/data-service/` - Julia (Oxygen) Data Service
+- `frontend/` - Next.js React Application
+- `tests/robot/` - Robot Framework End-to-End Tests
 - `cv/` - LaTeX CV variants (moderncv template, banking style)
 - `cover_letters/` - LaTeX cover letters (custom cover.cls template)
 - `.claude/skills/` - AI skill definitions for the application workflow

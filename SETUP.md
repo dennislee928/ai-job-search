@@ -4,142 +4,50 @@ Step-by-step instructions for getting the AI Job Search framework running.
 
 ## 1. Prerequisites
 
-### Claude Code
+- **[Docker](https://docs.docker.com/get-docker/)**: Must be installed and running.
+- **Docker Compose**: Included with Docker Desktop.
+- **Python 3.11+**: For running the Robot Framework test suite.
 
-Install Claude Code (Anthropic's CLI for Claude):
+## 2. Boot the Infrastructure
 
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-You'll need an Anthropic API key or a Claude Pro/Team subscription. See the [Claude Code docs](https://docs.anthropic.com/en/docs/claude-code) for details.
-
-### Python
-
-Python 3.10+ is required for the salary lookup tool. Check with:
+This platform is a polyglot microservice architecture. To start everything, run:
 
 ```bash
-python3 --version
+docker compose up --build -d
 ```
 
-On Windows, `py --version` is often the most reliable check. If your system exposes Python as `python` instead of `python3`, use `python` in the commands below.
+This will spin up the following containers:
+- `api-gateway` (Go)
+- `ai-service` (Python/FastAPI)
+- `data-service` (Julia)
+- `frontend` (Next.js)
+- `postgres` (Relational Database)
+- `minio` (S3 Object Storage)
+- `qdrant` (Vector Database)
+- `neo4j` (Graph Database)
+- `redis` (Cache)
 
-### Bun (for job search tools)
+Wait for the containers to fully initialize before proceeding.
 
-The job portal CLIs (four Danish portals plus the country-agnostic `linkedin-search` and `freehire-search` tools) are written in TypeScript and run with Bun.
+## 3. Verify End-to-End Tests
 
-- macOS/Linux:
+We use Robot Framework to ensure the microservices communicate with the databases correctly.
 
 ```bash
-curl -fsSL https://bun.sh/install | bash
+cd tests/robot
+pip install -r requirements.txt
+robot api_tests.robot
 ```
 
-- Windows PowerShell:
+The tests will verify:
+- API Gateway writes users to PostgreSQL.
+- AI Service uploads resumes to MinIO.
+- AI Service queries Qdrant for Semantic Matches.
+- Data Service queries Neo4j for Graph Traversals.
 
-```powershell
-powershell -ExecutionPolicy Bypass -c "irm https://bun.sh/install.ps1 | iex"
-```
+## 4. Run the Web UI
 
-If you prefer a package manager, `winget install Oven-sh.Bun` also works on Windows.
-
-### LaTeX (for compiling CVs and cover letters)
-
-Install a LaTeX distribution to compile the generated `.tex` files to PDF:
-
-- **Windows:** [MiKTeX](https://miktex.org/download)
-- **macOS:** [MacTeX](https://tug.org/mactex/)
-- **Linux:** `sudo apt install texlive-full` or `sudo dnf install texlive-scheme-full`
-
-The CV compiles with `lualatex` (pdflatex often fails on modern MiKTeX installs with `fontawesome5` font-expansion errors). The cover letter compiles with `xelatex` because `cover.cls` requires `fontspec` for its custom Lato/Raleway fonts.
-
-#### Minimal TeX install: TinyTeX/BasicTeX
-
-Full TeX distributions work out of the box, but minimal distributions need a few extra packages before the stock templates compile.
-
-On macOS, a user-level TinyTeX install avoids a system-wide installer and does not require `sudo`:
-
-```bash
-curl -fsSL https://yihui.org/tinytex/install-bin-unix.sh -o /tmp/tinytex-install-bin-unix.sh
-sh /tmp/tinytex-install-bin-unix.sh /tmp --no-path
-export PATH="$HOME/Library/TinyTeX/bin/universal-darwin:$PATH"
-```
-
-Then install the template dependencies:
-
-```bash
-tlmgr install \
-  moderncv fontawesome5 fontawesome6 academicons import luatexbase pgf \
-  titlesec textpos xltxtra xunicode cite realscripts needspace
-```
-
-For BasicTeX/MacTeX, make sure the TeX binary directory is on `PATH` first (for example via `/Library/TeX/texbin`), then run the same `tlmgr install ...` command.
-
-Quick smoke tests after setup:
-
-```bash
-cd cv && lualatex -interaction=nonstopmode -halt-on-error main_example.tex && cd ..
-
-SMOKE_DIR="$(mktemp -d /tmp/ai-job-cover-smoke.XXXXXX)"
-cp -R cover_letters/cover.cls cover_letters/OpenFonts "$SMOKE_DIR/"
-cat >"$SMOKE_DIR/cover_smoke.tex" <<'EOF'
-\documentclass[]{cover}
-\begin{document}
-\namesection{Test}{Candidate}{test@example.com}
-\companyname{Example Company}
-\companyaddress{123 Hiring Street\\Example City}
-\currentdate{\today}
-\lettercontent{Dear Hiring Manager,}
-\lettercontent{This smoke test verifies that xelatex can load cover.cls and the bundled fonts.}
-\closing{Sincerely,}
-\signature{Test Candidate}
-\end{document}
-EOF
-(cd "$SMOKE_DIR" && xelatex -interaction=nonstopmode -halt-on-error cover_smoke.tex)
-```
-
-### Optional: pdftotext (for the ATS check)
-
-`/apply` runs an ATS parseability check on the compiled CV: it extracts the PDF's text layer and verifies contact details, reading order, and keyword coverage the way an applicant-tracking system sees them. This uses `pdftotext` from [poppler](https://poppler.freedesktop.org/), which is not part of TeX distributions:
-
-- **macOS:** `brew install poppler`
-- **Debian/Ubuntu:** `sudo apt install poppler-utils`
-- **Windows:** `choco install poppler`
-
-If `pdftotext` is missing, `/apply` skips the mechanical check with a warning and falls back to a visual keyword review — everything else works normally.
-
-## 2. Fork and clone
-
-```bash
-gh repo fork MadsLorentzen/ai-job-search --clone
-cd ai-job-search
-```
-
-Or manually: fork on GitHub, then clone your fork.
-
-## 3. Install job search CLI dependencies
-Run these from the repository root.
-
-- PowerShell:
-
-```powershell
-$tools = @("jobbank-search", "jobdanmark-search", "jobindex-search", "jobnet-search", "linkedin-search", "freehire-search")
-foreach ($tool in $tools) {
-  Push-Location ".agents/skills/$tool/cli"
-  bun install
-  Pop-Location
-}
-```
-
-- Bash / zsh / Git Bash:
-```bash
-for tool in jobbank-search jobdanmark-search jobindex-search jobnet-search linkedin-search freehire-search; do
-  (cd .agents/skills/$tool/cli && bun install)
-done
-```
-
-For `linkedin-search` and `freehire-search` the install is optional: both have zero runtime dependencies and run with plain `bun`; `bun install` only pulls TypeScript dev types.
-
-If you're outside Denmark, you can generate an equivalent search skill for your local job board with `/add-portal` — it scaffolds the same CLI structure for any public portal and test-runs a live query before registering. See the "Job search tools" section in the README.
+Open your browser and navigate to `http://localhost:3000`. You can interact with the fully refactored AI Job Search assistant from the web interface!
 
 ## 4. Run the setup interview
 
