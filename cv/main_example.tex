@@ -3,7 +3,7 @@
 %% Use as a master reference when tailoring role-specific CVs.
 %%
 %% SETUP: Run /setup to populate this with your actual information.
-%% Compile with: lualatex main_example.tex
+%% Compile with: xelatex main_example.tex
 %% (pdflatex often fails on modern MiKTeX with fontawesome5 font-expansion errors.)
 
 \documentclass[11pt,a4paper,sans]{moderncv}
@@ -11,7 +11,7 @@
 \moderncvcolor{blue}
 
 % Force both first and last name AND section headings to render in moderncv
-% blue (color1). Default banking on lualatex+MiKTeX leaves these black, which
+% blue (color1). Default banking on xelatex+MiKTeX leaves these black, which
 % looks inconsistent with the rest of the blue accent scheme.
 \renewcommand*{\firstnamestyle}[1]{{\fontsize{34}{36}\bfseries\upshape\color{color1}#1}}
 \renewcommand*{\lastnamestyle}[1]{{\fontsize{34}{36}\bfseries\upshape\color{color1}#1}}
