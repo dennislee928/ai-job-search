@@ -1,5 +1,5 @@
 import styles from "./profile.module.css";
-import { Mail, Phone, MapPin, Linkedin, Github } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Terminal } from "lucide-react";
 
 export default function ProfilePage() {
   return (
@@ -34,11 +34,11 @@ export default function ProfilePage() {
               <span>San Francisco, CA (Remote)</span>
             </div>
             <div className={styles.contactItem}>
-              <Linkedin size={16} />
+              <Globe size={16} />
               <span>linkedin.com/in/sarahjenkins</span>
             </div>
             <div className={styles.contactItem}>
-              <Github size={16} />
+              <Terminal size={16} />
               <span>github.com/sarahj</span>
             </div>
           </div>
