@@ -1,6 +1,7 @@
 module ApiRoutes
 
 using Oxygen
+using HTTP
 include("../controllers/graph_controller.jl")
 using .GraphController
 

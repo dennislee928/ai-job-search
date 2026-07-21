@@ -1,0 +1,206 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 8px 0 0 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.card {
+  background-color: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-glass);
+}
+
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.avatarLarge {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+}
+
+.basicInfo h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.75rem;
+}
+
+.jobTitle {
+  color: var(--accent-secondary);
+  font-size: 1.1rem;
+  margin: 0 0 16px 0;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.contactItem svg {
+  color: var(--accent-primary);
+}
+
+.row {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.skillsCard {
+  flex: 2;
+}
+
+.resumeCard {
+  flex: 1;
+}
+
+.card h3 {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-weight: 500;
+}
+
+.skillsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.skillPill {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.resumeStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.pdfIcon {
+  width: 48px;
+  height: 48px;
+  background-color: #ef4444;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.resumeInfo h4 {
+  margin: 0 0 4px 0;
+  font-size: 0.95rem;
+}
+
+.resumeInfo p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.resumeActions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btnPrimary, .btnSecondary, .btnOutline {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  flex: 1;
+}
+
+.btnPrimary {
+  background: var(--accent-primary);
+  color: white;
+}
+
+.btnPrimary:hover {
+  background: var(--accent-primary-hover);
+}
+
+.btnSecondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btnOutline {
+  background: transparent;
+  color: var(--accent-secondary);
+  border: 1px dashed var(--accent-secondary);
+  width: 100%;
+}
+
+.btnOutline:hover {
+  background: rgba(6, 182, 212, 0.1);
+}
+
+@media (max-width: 900px) {
+  .row {
+    flex-direction: column;
+  }
+}

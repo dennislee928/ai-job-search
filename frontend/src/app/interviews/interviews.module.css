@@ -1,0 +1,214 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 8px 0 0 0;
+}
+
+.content {
+  display: flex;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.upcomingList {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.upcomingList h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.interviewCard {
+  background-color: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-glass);
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.interviewCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-secondary);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.companyInfo {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.companyInitial {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: white;
+  color: black;
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.companyInfo h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.companyInfo p {
+  margin: 4px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.typeTag {
+  background-color: rgba(139, 92, 246, 0.15);
+  color: var(--accent-primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.cardBody {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.btnPrimary, .btnSecondary, .btnOutline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnPrimary {
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.btnSecondary {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btnSecondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.prepSidebar {
+  flex: 1;
+}
+
+.prepCard {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.05) 0%, rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
+}
+
+.prepIcon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.prepCard h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.2rem;
+  color: var(--accent-primary);
+}
+
+.prepCard p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.btnOutline {
+  background: transparent;
+  color: var(--accent-secondary);
+  border: 1px dashed var(--accent-secondary);
+  width: 100%;
+  justify-content: center;
+}
+
+.btnOutline:hover {
+  background: rgba(6, 182, 212, 0.1);
+}
+
+@media (max-width: 900px) {
+  .content {
+    flex-direction: column;
+  }
+  .cardBody {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+}

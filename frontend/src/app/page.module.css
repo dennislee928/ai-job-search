@@ -1,0 +1,93 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 4px 0 var(--spacing-lg) 0;
+  color: var(--text-primary);
+}
+
+.searchBar {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0 var(--spacing-md);
+  height: 48px;
+  max-width: 800px;
+  transition: border-color 0.2s;
+}
+
+.searchBar:focus-within {
+  border-color: var(--accent-secondary);
+}
+
+.searchIcon {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.searchBar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0 var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.searchBar input::placeholder {
+  color: var(--text-secondary);
+}
+
+.topSection {
+  display: flex;
+  gap: var(--spacing-xl);
+  height: 300px;
+}
+
+.resumeCol {
+  flex: 1;
+}
+
+.chatCol {
+  flex: 1;
+}
+
+.matchesSection h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .topSection {
+    flex-direction: column;
+    height: auto;
+  }
+}

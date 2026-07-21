@@ -3,7 +3,7 @@ module api-gateway
 go 1.25.5
 
 require (
-	github.com/casbin/casbin/v2 v2.135.0
+	github.com/casbin/casbin/v3 v3.10.0
 	github.com/casbin/gorm-adapter/v3 v3.41.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-migrate/migrate/v4 v4.19.1
@@ -25,7 +25,7 @@ require (
 	github.com/bytedance/gopkg v0.1.4 // indirect
 	github.com/bytedance/sonic v1.15.2 // indirect
 	github.com/bytedance/sonic/loader v0.5.1 // indirect
-	github.com/casbin/casbin/v3 v3.8.1 // indirect
+
 	github.com/casbin/govaluate v1.10.0 // indirect
 	github.com/cloudwego/base64x v0.1.7 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

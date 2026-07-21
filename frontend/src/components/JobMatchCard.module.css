@@ -1,0 +1,205 @@
+.card {
+  background-color: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-glass);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  border-color: var(--border-color-hover);
+}
+
+.header {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+}
+
+.companyLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: white;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.titleInfo h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.companyName {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.meta {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-sm);
+}
+
+.progressCircle {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.progressCircle svg {
+  transform: rotate(-90deg);
+}
+
+.bgCircle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 6;
+}
+
+.fgCircle {
+  fill: none;
+  stroke: var(--accent-secondary);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease-out;
+}
+
+.percentage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.num {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lbl {
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+.dotMatch {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-secondary);
+}
+
+.dotGap {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+}
+
+.detailLabel {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.detailValue {
+  font-weight: 500;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--spacing-sm);
+}
+
+.tag {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: auto;
+  padding-top: var(--spacing-sm);
+}
+
+.btnPrimary, .btnSecondary {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnPrimary {
+  background-color: var(--accent-secondary);
+  color: white;
+}
+
+.btnPrimary:hover {
+  background-color: var(--accent-secondary-hover);
+}
+
+.btnSecondary {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btnSecondary:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--text-secondary);
+}
