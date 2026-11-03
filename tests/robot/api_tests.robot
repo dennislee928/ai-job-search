@@ -23,43 +23,79 @@ Verify Program Search Through Nginx
     ${response}=    POST On Session    api    /api/v1/programs/search    json=${body}    headers=${headers}    expected_status=200
     Should Not Be Equal    ${response.json()}    ${None}
 
-Verify Score Is Stored Only After A Successful Calculation
-    [Documentation]    A zero-cost program is rejected and nothing is stored. A priced program is stored.
+Verify School Without Cost Stores Nothing
+    [Documentation]    A school with no tuition or living cost is rejected and no snapshot is stored.
     ${token}=    Login As Robot
     ${headers}=    Create Dictionary    Authorization=Bearer ${token}    Content-Type=application/json
-
     ${free}=    Create Dictionary
-    ...    name=Free Sample
-    ...    institution=Example College
-    ...    level=other
-    ...    duration_years=${1}
+    ...    kind=school
+    ...    name=Free School
+    ...    level=bachelor
+    ...    field=software
     ...    tuition=${0}
     ...    living_cost_per_year=${0}
-    ...    opportunity_cost_per_year=${0}
-    ...    expected_annual_premium=${1000}
+    ...    annual_budget=${0}
+    ...    expected_starting_salary=${10000}
+    ...    forgone_annual_income=${0}
     ${created}=    POST On Session    api    /api/v1/programs    json=${free}    headers=${headers}    expected_status=200
+    Should Be Equal As Numbers    ${created.json()['duration_years']}    4
     ${free_id}=    Set Variable    ${created.json()['id']}
-    ${score_body}=    Score Body
-    POST On Session    api    /api/v1/programs/${free_id}/scores    json=${score_body}    headers=${headers}    expected_status=400
+    POST On Session    api    /api/v1/programs/${free_id}/scores    headers=${headers}    expected_status=400
     ${empty}=    GET On Session    api    /api/v1/programs/${free_id}/scores    headers=${headers}    expected_status=200
     Length Should Be    ${empty.json()}    0
 
+Verify Program Score Is Stored
+    [Documentation]    A priced program is calculated and one snapshot is stored.
+    ${token}=    Login As Robot
+    ${headers}=    Create Dictionary    Authorization=Bearer ${token}    Content-Type=application/json
     ${priced}=    Create Dictionary
+    ...    kind=program
     ...    name=Computer Science
     ...    institution=Example University
     ...    level=bachelor
+    ...    field=software
     ...    duration_years=${4}
     ...    tuition=${10000}
     ...    living_cost_per_year=${8000}
-    ...    opportunity_cost_per_year=${20000}
-    ...    expected_annual_premium=${15000}
+    ...    annual_budget=${20000}
+    ...    expected_starting_salary=${15000}
+    ...    forgone_annual_income=${0}
     ${created}=    POST On Session    api    /api/v1/programs    json=${priced}    headers=${headers}    expected_status=200
     ${program_id}=    Set Variable    ${created.json()['id']}
-    ${scored}=    POST On Session    api    /api/v1/programs/${program_id}/scores    json=${score_body}    headers=${headers}    expected_status=200
-    Dictionary Should Contain Key    ${scored.json()}    cp_ratio
+    ${scored}=    POST On Session    api    /api/v1/programs/${program_id}/scores    headers=${headers}    expected_status=200
+    Should Be Equal    ${scored.json()['fully_covered']}    ${False}
+    Should Not Be Equal    ${scored.json()['cp_ratio']}    ${None}
     Dictionary Should Contain Key    ${scored.json()}    ai_replacement_10
     Dictionary Should Contain Key    ${scored.json()}    career_outlook_30
     ${stored}=    GET On Session    api    /api/v1/programs/${program_id}/scores    headers=${headers}    expected_status=200
+    Length Should Be    ${stored.json()}    1
+
+Verify Scholarship Can Be Fully Covered
+    [Documentation]    A scholarship that covers tuition and living returns no CP ratio and payback of zero.
+    ${token}=    Login As Robot
+    ${headers}=    Create Dictionary    Authorization=Bearer ${token}    Content-Type=application/json
+    ${award}=    Create Dictionary
+    ...    kind=scholarship
+    ...    name=Full Award
+    ...    sponsor=Example Foundation
+    ...    institution=Example University
+    ...    level=master
+    ...    field=medicine
+    ...    duration_years=${2}
+    ...    tuition=${10000}
+    ...    living_cost_per_year=${8000}
+    ...    scholarship_amount_per_year=${20000}
+    ...    scholarship_covers=both
+    ...    annual_budget=${5000}
+    ...    expected_starting_salary=${20000}
+    ...    forgone_annual_income=${0}
+    ${created}=    POST On Session    api    /api/v1/programs    json=${award}    headers=${headers}    expected_status=200
+    ${award_id}=    Set Variable    ${created.json()['id']}
+    ${scored}=    POST On Session    api    /api/v1/programs/${award_id}/scores    headers=${headers}    expected_status=200
+    Should Be Equal    ${scored.json()['fully_covered']}    ${True}
+    Should Be Equal    ${scored.json()['cp_ratio']}    ${None}
+    Should Be Equal As Numbers    ${scored.json()['payback_years']}    0
+    ${stored}=    GET On Session    api    /api/v1/programs/${award_id}/scores    headers=${headers}    expected_status=200
     Length Should Be    ${stored.json()}    1
 
 Verify MinIO Role - File Upload
@@ -80,13 +116,3 @@ Login As Robot
     ${body}=    Create Dictionary    email=robot@example.com
     ${response}=    POST On Session    api    /api/v1/auth/login    json=${body}    expected_status=200
     RETURN    ${response.json()['token']}
-
-Score Body
-    ${body}=    Create Dictionary
-    ...    horizon_years=${10}
-    ...    routine=${0.4}
-    ...    social=${0.7}
-    ...    physical=${0.2}
-    ...    licensed=${True}
-    ...    current_automation=${0.1}
-    RETURN    ${body}

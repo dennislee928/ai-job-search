@@ -16,34 +16,46 @@ pub struct UserRow {
 #[derive(Debug, FromRow)]
 struct ProgramRow {
     id: Uuid,
+    kind: String,
     name: String,
     institution: String,
+    sponsor: String,
     level: String,
     field: String,
     country: String,
     duration_years: f64,
     tuition: f64,
     living_cost_per_year: f64,
-    opportunity_cost_per_year: f64,
-    expected_annual_premium: f64,
+    annual_budget: f64,
+    expected_starting_salary: f64,
+    forgone_annual_income: f64,
+    scholarship_amount_per_year: f64,
+    scholarship_covers: String,
     url: String,
     created_at: DateTime<Utc>,
 }
+
+const PROGRAM_COLUMNS: &str = "id, kind, name, institution, sponsor, level, field, country, duration_years, tuition, living_cost_per_year, annual_budget, expected_starting_salary, forgone_annual_income, scholarship_amount_per_year, scholarship_covers, url, created_at";
 
 impl From<ProgramRow> for ProgramResponse {
     fn from(row: ProgramRow) -> Self {
         Self {
             id: row.id,
+            kind: row.kind,
             name: row.name,
             institution: row.institution,
+            sponsor: row.sponsor,
             level: row.level,
             field: row.field,
             country: row.country,
             duration_years: row.duration_years,
             tuition: row.tuition,
             living_cost_per_year: row.living_cost_per_year,
-            opportunity_cost_per_year: row.opportunity_cost_per_year,
-            expected_annual_premium: row.expected_annual_premium,
+            annual_budget: row.annual_budget,
+            expected_starting_salary: row.expected_starting_salary,
+            forgone_annual_income: row.forgone_annual_income,
+            scholarship_amount_per_year: row.scholarship_amount_per_year,
+            scholarship_covers: row.scholarship_covers,
             url: row.url,
             created_at: row.created_at,
         }
@@ -57,6 +69,8 @@ struct ScoreRow {
     inputs: Value,
     cp_ratio: Option<f64>,
     payback_years: Option<f64>,
+    fully_covered: bool,
+    over_budget: bool,
     ai_replacement_10: f64,
     ai_replacement_20: f64,
     ai_replacement_30: f64,
@@ -75,6 +89,8 @@ impl From<ScoreRow> for ScoreResponse {
             inputs: row.inputs,
             cp_ratio: row.cp_ratio,
             payback_years: row.payback_years,
+            fully_covered: row.fully_covered,
+            over_budget: row.over_budget,
             ai_replacement_10: row.ai_replacement_10,
             ai_replacement_20: row.ai_replacement_20,
             ai_replacement_30: row.ai_replacement_30,
@@ -118,28 +134,32 @@ pub async fn insert_program(
     pool: &PgPool,
     user_id: Uuid,
     req: &CreateProgramRequest,
+    duration_years: f64,
 ) -> Result<ProgramResponse, ApiError> {
-    let row = sqlx::query_as::<_, ProgramRow>(
+    let row = sqlx::query_as::<_, ProgramRow>(&format!(
         "INSERT INTO education_programs (
-            user_id, name, institution, level, field, country, duration_years,
-            tuition, living_cost_per_year, opportunity_cost_per_year,
-            expected_annual_premium, url
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-        RETURNING id, name, institution, level, field, country, duration_years,
-                  tuition, living_cost_per_year, opportunity_cost_per_year,
-                  expected_annual_premium, url, created_at",
-    )
+            user_id, kind, name, institution, sponsor, level, field, country, duration_years,
+            tuition, living_cost_per_year, annual_budget, expected_starting_salary,
+            forgone_annual_income, scholarship_amount_per_year, scholarship_covers, url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+        RETURNING {PROGRAM_COLUMNS}"
+    ))
     .bind(user_id)
+    .bind(&req.kind)
     .bind(req.name.trim())
     .bind(req.institution.trim())
+    .bind(req.sponsor.trim())
     .bind(&req.level)
-    .bind(req.field.trim())
+    .bind(&req.field)
     .bind(req.country.trim())
-    .bind(req.duration_years)
+    .bind(duration_years)
     .bind(req.tuition)
     .bind(req.living_cost_per_year)
-    .bind(req.opportunity_cost_per_year)
-    .bind(req.expected_annual_premium)
+    .bind(req.annual_budget)
+    .bind(req.expected_starting_salary)
+    .bind(req.forgone_annual_income)
+    .bind(req.scholarship_amount_per_year)
+    .bind(&req.scholarship_covers)
     .bind(req.url.trim())
     .fetch_one(pool)
     .await
@@ -151,14 +171,9 @@ pub async fn insert_program(
 }
 
 pub async fn list_programs(pool: &PgPool, user_id: Uuid) -> Result<Vec<ProgramResponse>, ApiError> {
-    let rows = sqlx::query_as::<_, ProgramRow>(
-        "SELECT id, name, institution, level, field, country, duration_years,
-                tuition, living_cost_per_year, opportunity_cost_per_year,
-                expected_annual_premium, url, created_at
-         FROM education_programs
-         WHERE user_id = $1
-         ORDER BY created_at DESC",
-    )
+    let rows = sqlx::query_as::<_, ProgramRow>(&format!(
+        "SELECT {PROGRAM_COLUMNS} FROM education_programs WHERE user_id = $1 ORDER BY created_at DESC"
+    ))
     .bind(user_id)
     .fetch_all(pool)
     .await
@@ -174,13 +189,9 @@ pub async fn find_program(
     user_id: Uuid,
     program_id: Uuid,
 ) -> Result<ProgramResponse, ApiError> {
-    let row = sqlx::query_as::<_, ProgramRow>(
-        "SELECT id, name, institution, level, field, country, duration_years,
-                tuition, living_cost_per_year, opportunity_cost_per_year,
-                expected_annual_premium, url, created_at
-         FROM education_programs
-         WHERE id = $1 AND user_id = $2",
-    )
+    let row = sqlx::query_as::<_, ProgramRow>(&format!(
+        "SELECT {PROGRAM_COLUMNS} FROM education_programs WHERE id = $1 AND user_id = $2"
+    ))
     .bind(program_id)
     .bind(user_id)
     .fetch_optional(pool)
@@ -194,8 +205,10 @@ pub async fn find_program(
 
 pub struct NewScore {
     pub inputs: Value,
-    pub cp_ratio: f64,
+    pub cp_ratio: Option<f64>,
     pub payback_years: Option<f64>,
+    pub fully_covered: bool,
+    pub over_budget: bool,
     pub ai_replacement_10: f64,
     pub ai_replacement_20: f64,
     pub ai_replacement_30: f64,
@@ -212,12 +225,12 @@ pub async fn insert_score(
 ) -> Result<ScoreResponse, ApiError> {
     let row = sqlx::query_as::<_, ScoreRow>(
         "INSERT INTO score_snapshots (
-            program_id, inputs, cp_ratio, payback_years,
+            program_id, inputs, cp_ratio, payback_years, fully_covered, over_budget,
             ai_replacement_10, ai_replacement_20, ai_replacement_30,
             career_outlook_10, career_outlook_20, career_outlook_30,
             model_note
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        RETURNING id, program_id, inputs, cp_ratio, payback_years,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        RETURNING id, program_id, inputs, cp_ratio, payback_years, fully_covered, over_budget,
                   ai_replacement_10, ai_replacement_20, ai_replacement_30,
                   career_outlook_10, career_outlook_20, career_outlook_30,
                   model_note, created_at",
@@ -226,6 +239,8 @@ pub async fn insert_score(
     .bind(&score.inputs)
     .bind(score.cp_ratio)
     .bind(score.payback_years)
+    .bind(score.fully_covered)
+    .bind(score.over_budget)
     .bind(score.ai_replacement_10)
     .bind(score.ai_replacement_20)
     .bind(score.ai_replacement_30)
@@ -249,7 +264,7 @@ pub async fn list_scores(
 ) -> Result<Vec<ScoreResponse>, ApiError> {
     find_program(pool, user_id, program_id).await?;
     let rows = sqlx::query_as::<_, ScoreRow>(
-        "SELECT id, program_id, inputs, cp_ratio, payback_years,
+        "SELECT id, program_id, inputs, cp_ratio, payback_years, fully_covered, over_budget,
                 ai_replacement_10, ai_replacement_20, ai_replacement_30,
                 career_outlook_10, career_outlook_20, career_outlook_30,
                 model_note, created_at

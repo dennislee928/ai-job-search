@@ -11,7 +11,7 @@ from models.schemas import (
 )
 from services.orchestrator import generate_text, generate_cover_letter
 from services.qdrant_service import qdrant_service
-from services.scoring import ScoreError, score_program
+from services.scoring import ScoreError, score_offer
 from services.storage import storage_service
 
 router = APIRouter()
@@ -40,18 +40,18 @@ async def search_programs(req: JobSearchRequest):
 @router.post("/programs/score", response_model=ProgramScoreResponse)
 async def score_education_program(req: ProgramScoreRequest):
     try:
-        return score_program(
+        return score_offer(
+            req.kind,
+            req.level,
+            req.field,
+            req.annual_budget,
+            req.expected_starting_salary,
+            req.forgone_annual_income,
             req.tuition,
             req.living_cost_per_year,
             req.duration_years,
-            req.opportunity_cost_per_year,
-            req.expected_annual_premium,
-            req.horizon_years,
-            req.routine,
-            req.social,
-            req.physical,
-            req.licensed,
-            req.current_automation,
+            req.scholarship_amount_per_year,
+            req.scholarship_covers,
         )
     except ScoreError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

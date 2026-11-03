@@ -10,8 +10,6 @@ pub struct CatalogProgram {
     pub tuition: Option<f64>,
     pub living_cost_per_year: Option<f64>,
     pub duration_years: Option<f64>,
-    pub opportunity_cost_per_year: Option<f64>,
-    pub expected_annual_premium: Option<f64>,
 }
 
 #[derive(Debug, Deserialize)]

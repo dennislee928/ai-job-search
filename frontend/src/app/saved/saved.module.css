@@ -1,0 +1,60 @@
+.saved {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-width: 960px;
+}
+
+.saved h1 {
+  margin: 0;
+}
+
+.saved header p,
+.saved p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.saved input {
+  display: block;
+  width: min(320px, 100%);
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font: inherit;
+}
+
+.saved button {
+  width: fit-content;
+  padding: 0.7rem 1rem;
+  color: white;
+  background: var(--accent-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font: inherit;
+  cursor: pointer;
+}
+
+.saved ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.saved li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.error {
+  color: #fca5a5;
+}

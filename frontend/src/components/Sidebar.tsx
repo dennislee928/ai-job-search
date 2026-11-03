@@ -2,16 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, User, FileText, Video, Route, Settings } from "lucide-react";
+import { Bookmark, Search } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "學程搜尋", href: "/" },
-  { icon: User, label: "Profile", href: "/profile" },
-  { icon: FileText, label: "Applications", href: "/applications" },
-  { icon: Video, label: "Interviews", href: "/interviews" },
-  { icon: Route, label: "AI Career Path", href: "/path" },
-  { icon: Settings, label: "Settings", href: "/settings" },
+  { icon: Search, label: "搜尋", href: "/" },
+  { icon: Bookmark, label: "已存項目", href: "/saved" },
 ];
 
 export default function Sidebar() {
@@ -20,15 +16,15 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
-        <div className={styles.logo}>🧠</div>
+        <div className={styles.logo}>🎓</div>
         <h2>學程<span>搜尋</span></h2>
       </div>
 
       <div className={styles.userProfile}>
-        <div className={styles.avatar}>SJ</div>
+        <div className={styles.avatar}>學</div>
         <div className={styles.userInfo}>
           <h3>學生</h3>
-          <p>學程比較</p>
+          <p>學校、學程、獎學金</p>
           <span className={styles.status}>
             <span className={styles.statusDot}></span> online
           </span>
@@ -39,10 +35,10 @@ export default function Sidebar() {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
-          
+
           return (
-            <Link 
-              key={item.label} 
+            <Link
+              key={item.href}
               href={item.href}
               className={`${styles.navItem} ${isActive ? styles.active : ""}`}
             >

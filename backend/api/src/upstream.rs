@@ -8,7 +8,7 @@ use serde_json::{json, Value};
 
 use crate::auth::AppState;
 use crate::auth::CurrentUser;
-use crate::dto::{CreateScoreRequest, ProgramResponse, ProgramSearchRequest};
+use crate::dto::{ProgramResponse, ProgramSearchRequest};
 use crate::error::ApiError;
 use crate::repo::NewScore;
 
@@ -21,8 +21,10 @@ struct HorizonValues {
 
 #[derive(Debug, Deserialize)]
 struct AiScore {
-    cp_ratio: f64,
+    cp_ratio: Option<f64>,
     payback_years: Option<f64>,
+    fully_covered: bool,
+    over_budget: bool,
     ai_replacement: HorizonValues,
     career_outlook: HorizonValues,
     model_note: String,
@@ -30,25 +32,22 @@ struct AiScore {
 
 pub fn score_payload(
     program: &ProgramResponse,
-    request: &CreateScoreRequest,
     catalog_tuition: Option<f64>,
     catalog_living: Option<f64>,
     catalog_duration: Option<f64>,
-    catalog_opportunity: Option<f64>,
-    catalog_premium: Option<f64>,
 ) -> Value {
     json!({
+        "kind": program.kind,
+        "level": program.level,
+        "field": program.field,
+        "annual_budget": program.annual_budget,
+        "expected_starting_salary": program.expected_starting_salary,
+        "forgone_annual_income": program.forgone_annual_income,
         "tuition": catalog_tuition.unwrap_or(program.tuition),
         "living_cost_per_year": catalog_living.unwrap_or(program.living_cost_per_year),
         "duration_years": catalog_duration.unwrap_or(program.duration_years),
-        "opportunity_cost_per_year": catalog_opportunity.unwrap_or(program.opportunity_cost_per_year),
-        "expected_annual_premium": catalog_premium.unwrap_or(program.expected_annual_premium),
-        "horizon_years": request.horizon_years,
-        "routine": request.routine,
-        "social": request.social,
-        "physical": request.physical,
-        "licensed": request.licensed,
-        "current_automation": request.current_automation,
+        "scholarship_amount_per_year": program.scholarship_amount_per_year,
+        "scholarship_covers": program.scholarship_covers,
     })
 }
 
@@ -86,6 +85,8 @@ pub async fn request_score(
         inputs: payload.clone(),
         cp_ratio: score.cp_ratio,
         payback_years: score.payback_years,
+        fully_covered: score.fully_covered,
+        over_budget: score.over_budget,
         ai_replacement_10: score.ai_replacement.years_10,
         ai_replacement_20: score.ai_replacement.years_20,
         ai_replacement_30: score.ai_replacement.years_30,

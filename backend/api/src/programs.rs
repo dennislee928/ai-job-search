@@ -8,9 +8,7 @@ use uuid::Uuid;
 use crate::auth::AppState;
 use crate::auth::CurrentUser;
 use crate::catalog;
-use crate::dto::{
-    validate_program, CreateProgramRequest, CreateScoreRequest, ProgramResponse, ScoreResponse,
-};
+use crate::dto::{prepare_offer, CreateProgramRequest, ProgramResponse, ScoreResponse};
 use crate::error::ApiError;
 use crate::repo;
 use crate::upstream::{request_score, score_payload};
@@ -18,10 +16,10 @@ use crate::upstream::{request_score, score_payload};
 pub async fn create_program(
     State(pool): State<PgPool>,
     CurrentUser(user): CurrentUser,
-    Json(body): Json<CreateProgramRequest>,
+    Json(mut body): Json<CreateProgramRequest>,
 ) -> Result<Json<ProgramResponse>, ApiError> {
-    validate_program(&body).map_err(ApiError::BadRequest)?;
-    let program = repo::insert_program(&pool, user.id, &body).await?;
+    let years = prepare_offer(&mut body).map_err(ApiError::BadRequest)?;
+    let program = repo::insert_program(&pool, user.id, &body, years).await?;
     Ok(Json(program))
 }
 
@@ -52,7 +50,6 @@ pub async fn create_score(
     State(state): State<AppState>,
     CurrentUser(user): CurrentUser,
     Path(id): Path<Uuid>,
-    Json(body): Json<CreateScoreRequest>,
 ) -> Result<Json<ScoreResponse>, ApiError> {
     let program = repo::find_program(&state.pool, user.id, id).await?;
     let catalog_hit = catalog::lookup_program(
@@ -64,18 +61,11 @@ pub async fn create_score(
     .await?;
     let payload = score_payload(
         &program,
-        &body,
         catalog_hit.as_ref().and_then(|hit| hit.tuition),
         catalog_hit
             .as_ref()
             .and_then(|hit| hit.living_cost_per_year),
         catalog_hit.as_ref().and_then(|hit| hit.duration_years),
-        catalog_hit
-            .as_ref()
-            .and_then(|hit| hit.opportunity_cost_per_year),
-        catalog_hit
-            .as_ref()
-            .and_then(|hit| hit.expected_annual_premium),
     );
     let score = request_score(&state.http, &state.ai_service_url, &payload).await?;
     let saved = repo::insert_score(&state.pool, program.id, score).await?;

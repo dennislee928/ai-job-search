@@ -4,6 +4,32 @@ use serde_json::Value;
 use uuid::Uuid;
 
 pub const LEVELS: [&str; 5] = ["high_school", "bachelor", "master", "phd", "other"];
+pub const KINDS: [&str; 3] = ["school", "program", "scholarship"];
+pub const FIELDS: [&str; 7] = [
+    "software",
+    "medicine",
+    "education",
+    "business",
+    "research",
+    "trades",
+    "other",
+];
+pub const COVERS: [&str; 3] = ["tuition", "living", "both"];
+
+fn default_covers() -> String {
+    "both".to_string()
+}
+
+pub fn default_years(level: &str) -> Option<f64> {
+    match level {
+        "high_school" => Some(3.0),
+        "bachelor" => Some(4.0),
+        "master" => Some(2.0),
+        "phd" => Some(4.0),
+        "other" => Some(1.0),
+        _ => None,
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct LoginRequest {
@@ -24,18 +50,27 @@ pub struct ProfileResponse {
 
 #[derive(Debug, Deserialize)]
 pub struct CreateProgramRequest {
+    pub kind: String,
     pub name: String,
+    #[serde(default)]
     pub institution: String,
     pub level: String,
-    #[serde(default)]
     pub field: String,
     #[serde(default)]
     pub country: String,
-    pub duration_years: f64,
+    #[serde(default)]
+    pub duration_years: Option<f64>,
     pub tuition: f64,
     pub living_cost_per_year: f64,
-    pub opportunity_cost_per_year: f64,
-    pub expected_annual_premium: f64,
+    pub annual_budget: f64,
+    pub expected_starting_salary: f64,
+    pub forgone_annual_income: f64,
+    #[serde(default)]
+    pub scholarship_amount_per_year: f64,
+    #[serde(default = "default_covers")]
+    pub scholarship_covers: String,
+    #[serde(default)]
+    pub sponsor: String,
     #[serde(default)]
     pub url: String,
 }
@@ -43,28 +78,23 @@ pub struct CreateProgramRequest {
 #[derive(Debug, Clone, Serialize)]
 pub struct ProgramResponse {
     pub id: Uuid,
+    pub kind: String,
     pub name: String,
     pub institution: String,
+    pub sponsor: String,
     pub level: String,
     pub field: String,
     pub country: String,
     pub duration_years: f64,
     pub tuition: f64,
     pub living_cost_per_year: f64,
-    pub opportunity_cost_per_year: f64,
-    pub expected_annual_premium: f64,
+    pub annual_budget: f64,
+    pub expected_starting_salary: f64,
+    pub forgone_annual_income: f64,
+    pub scholarship_amount_per_year: f64,
+    pub scholarship_covers: String,
     pub url: String,
     pub created_at: DateTime<Utc>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CreateScoreRequest {
-    pub horizon_years: f64,
-    pub routine: f64,
-    pub social: f64,
-    pub physical: f64,
-    pub licensed: bool,
-    pub current_automation: f64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -85,6 +115,8 @@ pub struct ScoreResponse {
     pub inputs: Value,
     pub cp_ratio: Option<f64>,
     pub payback_years: Option<f64>,
+    pub fully_covered: bool,
+    pub over_budget: bool,
     pub ai_replacement_10: f64,
     pub ai_replacement_20: f64,
     pub ai_replacement_30: f64,
@@ -117,32 +149,60 @@ pub fn email_from_authorization(header: &str) -> Option<String> {
     normalize_email(email).ok()
 }
 
-pub fn validate_program(req: &CreateProgramRequest) -> Result<(), String> {
+fn non_negative(label: &str, value: f64) -> Result<(), String> {
+    if !value.is_finite() || value < 0.0 {
+        return Err(format!("{label} must be zero or greater"));
+    }
+    Ok(())
+}
+
+pub fn prepare_offer(req: &mut CreateProgramRequest) -> Result<f64, String> {
     if req.name.trim().is_empty() || req.name.trim().chars().count() > 255 {
         return Err("name is required".to_string());
     }
-    if req.institution.trim().is_empty() || req.institution.trim().chars().count() > 255 {
-        return Err("institution is required".to_string());
+    if !KINDS.contains(&req.kind.as_str()) {
+        return Err("kind must be school, program, or scholarship".to_string());
     }
     if !LEVELS.contains(&req.level.as_str()) {
         return Err("level must be high_school, bachelor, master, phd, or other".to_string());
     }
-    if !req.duration_years.is_finite() || req.duration_years <= 0.0 {
-        return Err("duration_years must be greater than 0".to_string());
+    if !FIELDS.contains(&req.field.as_str()) {
+        return Err(
+            "field must be software, medicine, education, business, research, trades, or other"
+                .to_string(),
+        );
     }
+    if req.kind == "program" && req.institution.trim().is_empty() {
+        return Err("institution is required".to_string());
+    }
+    if req.kind == "scholarship" && req.sponsor.trim().is_empty() {
+        return Err("sponsor is required".to_string());
+    }
+    if req.kind == "school" && req.institution.trim().is_empty() {
+        req.institution = req.name.clone();
+    }
+    if !COVERS.contains(&req.scholarship_covers.as_str()) {
+        return Err("scholarship_covers must be tuition, living, or both".to_string());
+    }
+    let years = match req.duration_years {
+        Some(years) if years.is_finite() && years > 0.0 => years,
+        None if req.kind == "school" => default_years(&req.level).unwrap(),
+        _ => return Err("duration_years must be greater than 0".to_string()),
+    };
     for (label, value) in [
         ("tuition", req.tuition),
         ("living_cost_per_year", req.living_cost_per_year),
-        ("opportunity_cost_per_year", req.opportunity_cost_per_year),
+        ("annual_budget", req.annual_budget),
+        ("expected_starting_salary", req.expected_starting_salary),
+        ("forgone_annual_income", req.forgone_annual_income),
+        (
+            "scholarship_amount_per_year",
+            req.scholarship_amount_per_year,
+        ),
     ] {
-        if !value.is_finite() || value < 0.0 {
-            return Err(format!("{label} must be zero or greater"));
-        }
+        non_negative(label, value)?;
     }
-    if !req.expected_annual_premium.is_finite() {
-        return Err("expected_annual_premium must be a finite number".to_string());
-    }
-    Ok(())
+    Ok(years)
 }
 
 #[cfg(test)]
@@ -151,42 +211,49 @@ mod tests {
 
     fn valid_request() -> CreateProgramRequest {
         CreateProgramRequest {
+            kind: "program".into(),
             name: "Computer Science".into(),
             institution: "Example University".into(),
             level: "bachelor".into(),
-            field: "computing".into(),
+            field: "software".into(),
             country: "TW".into(),
-            duration_years: 4.0,
+            duration_years: Some(4.0),
             tuition: 10000.0,
             living_cost_per_year: 8000.0,
-            opportunity_cost_per_year: 20000.0,
-            expected_annual_premium: 15000.0,
-            url: "https://example.edu/cs".into(),
+            annual_budget: 20000.0,
+            expected_starting_salary: 15000.0,
+            forgone_annual_income: 0.0,
+            scholarship_amount_per_year: 0.0,
+            scholarship_covers: "both".into(),
+            sponsor: String::new(),
+            url: String::new(),
         }
     }
 
     #[test]
-    fn accepts_a_complete_program() {
-        assert!(validate_program(&valid_request()).is_ok());
+    fn accepts_a_program_and_defaults_school_years() {
+        let mut req = valid_request();
+        assert_eq!(prepare_offer(&mut req).unwrap(), 4.0);
+
+        let mut school = valid_request();
+        school.kind = "school".into();
+        school.institution.clear();
+        school.duration_years = None;
+        school.level = "master".into();
+        assert_eq!(prepare_offer(&mut school).unwrap(), 2.0);
+        assert_eq!(school.institution, "Computer Science");
     }
 
     #[test]
-    fn rejects_unknown_level_zero_duration_and_blank_name() {
+    fn rejects_unknown_field_and_a_scholarship_without_a_sponsor() {
         let mut req = valid_request();
-        req.level = "certificate".into();
-        assert!(validate_program(&req).is_err());
+        req.field = "design".into();
+        assert!(prepare_offer(&mut req).is_err());
 
-        let mut req = valid_request();
-        req.duration_years = 0.0;
-        assert!(validate_program(&req).is_err());
-
-        let mut req = valid_request();
-        req.name = "  ".into();
-        assert!(validate_program(&req).is_err());
-
-        let mut req = valid_request();
-        req.tuition = -1.0;
-        assert!(validate_program(&req).is_err());
+        let mut scholarship = valid_request();
+        scholarship.kind = "scholarship".into();
+        scholarship.sponsor.clear();
+        assert!(prepare_offer(&mut scholarship).is_err());
     }
 
     #[test]

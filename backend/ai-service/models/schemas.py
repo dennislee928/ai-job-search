@@ -26,21 +26,24 @@ class HorizonValues(BaseModel):
     years_30: float
 
 class ProgramScoreRequest(BaseModel):
+    kind: str
+    level: str
+    field: str
+    annual_budget: float
+    expected_starting_salary: float
+    forgone_annual_income: float
     tuition: float
     living_cost_per_year: float
-    duration_years: float
-    opportunity_cost_per_year: float
-    expected_annual_premium: float
-    horizon_years: float
-    routine: float
-    social: float
-    physical: float
-    licensed: bool
-    current_automation: float
+    duration_years: Optional[float] = None
+    scholarship_amount_per_year: float = 0
+    scholarship_covers: str = "both"
 
 class ProgramScoreResponse(BaseModel):
-    cp_ratio: float
+    cp_ratio: Optional[float] = None
     payback_years: Optional[float] = None
+    fully_covered: bool
+    over_budget: bool
+    duration_years: float
     ai_replacement: HorizonValues
     career_outlook: HorizonValues
     model_note: str
