@@ -1,0 +1,66 @@
+.container {
+  background-color: var(--bg-glass);
+  backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-glass);
+}
+
+.header h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.dropzone {
+  border: 2px dashed rgba(6, 182, 212, 0.4);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.02) 0%, rgba(139, 92, 246, 0.05) 100%);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dropzone:hover {
+  border-color: var(--accent-secondary);
+  background: linear-gradient(180deg, rgba(6, 182, 212, 0.05) 0%, rgba(139, 92, 246, 0.1) 100%);
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(6, 182, 212, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-secondary);
+}
+
+.text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.button {
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
