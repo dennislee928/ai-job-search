@@ -1,0 +1,125 @@
+.workbench {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-width: 960px;
+}
+
+.workbench h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.workbench header p {
+  margin: 0.25rem 0 0;
+  color: var(--text-secondary);
+}
+
+.search,
+.form {
+  display: grid;
+  gap: var(--spacing-md);
+}
+
+.search {
+  grid-template-columns: 1fr auto;
+}
+
+.form {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-glass);
+}
+
+.form label,
+.search {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.form input,
+.form select,
+.search input {
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.6rem 0.75rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font: inherit;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.check input {
+  width: auto;
+  margin: 0;
+}
+
+.search button,
+.form button {
+  padding: 0.7rem 1rem;
+  color: white;
+  background: var(--accent-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font: inherit;
+  cursor: pointer;
+}
+
+.search button:disabled,
+.form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.hits li {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.error {
+  margin: 0;
+  color: #fca5a5;
+}
+
+.score {
+  padding: var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.score table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.score th,
+.score td {
+  text-align: left;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.note {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}

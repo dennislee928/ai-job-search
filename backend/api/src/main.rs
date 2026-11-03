@@ -9,11 +9,13 @@ mod upstream;
 use std::time::Duration;
 
 use axum::{
+    http::{header, HeaderValue, Method},
     routing::{get, post},
     Json, Router,
 };
 use serde_json::{json, Value};
 use sqlx::postgres::PgPoolOptions;
+use tower_http::cors::CorsLayer;
 
 use auth::{login, profile, AppState};
 use programs::{create_program, create_score, get_program, list_programs, list_scores};
@@ -60,7 +62,16 @@ async fn main() {
             ai_service_url: std::env::var("AI_SERVICE_URL")
                 .unwrap_or_else(|_| "http://ai-service:8000".to_string()),
             catalog_api_url: std::env::var("CATALOG_API_URL").unwrap_or_default(),
-        });
+        })
+        .layer(
+            CorsLayer::new()
+                .allow_origin([
+                    HeaderValue::from_static("http://localhost:3000"),
+                    HeaderValue::from_static("http://localhost"),
+                ])
+                .allow_methods([Method::GET, Method::POST, Method::OPTIONS])
+                .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]),
+        );
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080")
         .await

@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "AI Job Search Dashboard",
-  description: "Your personalized career assistant.",
+  title: "學程搜尋",
+  description: "比較學程的 CP 值與未來情境。",
 };
 
 export default function RootLayout({

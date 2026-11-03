@@ -6,7 +6,7 @@ import { LayoutDashboard, User, FileText, Video, Route, Settings } from "lucide-
 import styles from "./Sidebar.module.css";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: LayoutDashboard, label: "學程搜尋", href: "/" },
   { icon: User, label: "Profile", href: "/profile" },
   { icon: FileText, label: "Applications", href: "/applications" },
   { icon: Video, label: "Interviews", href: "/interviews" },
@@ -21,14 +21,14 @@ export default function Sidebar() {
     <aside className={styles.sidebar}>
       <div className={styles.brand}>
         <div className={styles.logo}>🧠</div>
-        <h2>Cognito <span>AI</span></h2>
+        <h2>學程<span>搜尋</span></h2>
       </div>
 
       <div className={styles.userProfile}>
         <div className={styles.avatar}>SJ</div>
         <div className={styles.userInfo}>
-          <h3>Sarah J.</h3>
-          <p>Senior UX Designer</p>
+          <h3>學生</h3>
+          <p>學程比較</p>
           <span className={styles.status}>
             <span className={styles.statusDot}></span> online
           </span>
