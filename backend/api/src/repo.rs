@@ -192,6 +192,56 @@ pub async fn find_program(
     row.map(ProgramResponse::from).ok_or(ApiError::NotFound)
 }
 
+pub struct NewScore {
+    pub inputs: Value,
+    pub cp_ratio: f64,
+    pub payback_years: Option<f64>,
+    pub ai_replacement_10: f64,
+    pub ai_replacement_20: f64,
+    pub ai_replacement_30: f64,
+    pub career_outlook_10: f64,
+    pub career_outlook_20: f64,
+    pub career_outlook_30: f64,
+    pub model_note: String,
+}
+
+pub async fn insert_score(
+    pool: &PgPool,
+    program_id: Uuid,
+    score: NewScore,
+) -> Result<ScoreResponse, ApiError> {
+    let row = sqlx::query_as::<_, ScoreRow>(
+        "INSERT INTO score_snapshots (
+            program_id, inputs, cp_ratio, payback_years,
+            ai_replacement_10, ai_replacement_20, ai_replacement_30,
+            career_outlook_10, career_outlook_20, career_outlook_30,
+            model_note
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING id, program_id, inputs, cp_ratio, payback_years,
+                  ai_replacement_10, ai_replacement_20, ai_replacement_30,
+                  career_outlook_10, career_outlook_20, career_outlook_30,
+                  model_note, created_at",
+    )
+    .bind(program_id)
+    .bind(&score.inputs)
+    .bind(score.cp_ratio)
+    .bind(score.payback_years)
+    .bind(score.ai_replacement_10)
+    .bind(score.ai_replacement_20)
+    .bind(score.ai_replacement_30)
+    .bind(score.career_outlook_10)
+    .bind(score.career_outlook_20)
+    .bind(score.career_outlook_30)
+    .bind(score.model_note)
+    .fetch_one(pool)
+    .await
+    .map_err(|err| {
+        eprintln!("insert score failed: {err}");
+        ApiError::Internal
+    })?;
+    Ok(row.into())
+}
+
 pub async fn list_scores(
     pool: &PgPool,
     user_id: Uuid,

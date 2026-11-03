@@ -30,8 +30,11 @@ async def generate(req: GenerateRequest):
 
 @router.post("/jobs/search", response_model=List[JobMatchResponse])
 async def search_jobs(req: JobSearchRequest):
-    # Semantic Search via Qdrant
-    results = qdrant_service.search_jobs(req.query, limit=req.limit)
+    return await search_programs(req)
+
+@router.post("/programs/search", response_model=List[JobMatchResponse])
+async def search_programs(req: JobSearchRequest):
+    results = qdrant_service.search_jobs(req.query, limit=req.limit or 5)
     return results
 
 @router.post("/programs/score", response_model=ProgramScoreResponse)

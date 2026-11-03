@@ -57,6 +57,27 @@ pub struct ProgramResponse {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct CreateScoreRequest {
+    pub horizon_years: f64,
+    pub routine: f64,
+    pub social: f64,
+    pub physical: f64,
+    pub licensed: bool,
+    pub current_automation: f64,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ProgramSearchRequest {
+    pub query: String,
+    #[serde(default = "default_limit")]
+    pub limit: i64,
+}
+
+fn default_limit() -> i64 {
+    5
+}
+
 #[derive(Debug, Serialize)]
 pub struct ScoreResponse {
     pub id: Uuid,

@@ -3,6 +3,7 @@ use axum::{
     http::{header::AUTHORIZATION, request::Parts},
     Json,
 };
+use reqwest::Client;
 use sqlx::PgPool;
 
 use crate::dto::{
@@ -15,6 +16,9 @@ use crate::repo::{self, UserRow};
 #[derive(Clone)]
 pub struct AppState {
     pub pool: PgPool,
+    pub http: Client,
+    pub ai_service_url: String,
+    pub catalog_api_url: String,
 }
 
 impl FromRef<AppState> for PgPool {

@@ -10,6 +10,7 @@ pub enum ApiError {
     BadRequest(String),
     Unauthorized,
     NotFound,
+    BadGateway(String),
     Internal,
 }
 
@@ -19,6 +20,7 @@ impl IntoResponse for ApiError {
             ApiError::BadRequest(message) => (StatusCode::BAD_REQUEST, message),
             ApiError::Unauthorized => (StatusCode::UNAUTHORIZED, "unauthorized".to_string()),
             ApiError::NotFound => (StatusCode::NOT_FOUND, "not found".to_string()),
+            ApiError::BadGateway(message) => (StatusCode::BAD_GATEWAY, message),
             ApiError::Internal => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "internal error".to_string(),
