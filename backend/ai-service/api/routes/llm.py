@@ -1,8 +1,17 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from typing import List
-from models.schemas import GenerateRequest, GenerateResponse, JobSearchRequest, JobMatchResponse, CoverLetterRequest
+from models.schemas import (
+    GenerateRequest,
+    GenerateResponse,
+    JobSearchRequest,
+    JobMatchResponse,
+    CoverLetterRequest,
+    ProgramScoreRequest,
+    ProgramScoreResponse,
+)
 from services.orchestrator import generate_text, generate_cover_letter
 from services.qdrant_service import qdrant_service
+from services.scoring import ScoreError, score_program
 from services.storage import storage_service
 
 router = APIRouter()
@@ -24,6 +33,25 @@ async def search_jobs(req: JobSearchRequest):
     # Semantic Search via Qdrant
     results = qdrant_service.search_jobs(req.query, limit=req.limit)
     return results
+
+@router.post("/programs/score", response_model=ProgramScoreResponse)
+async def score_education_program(req: ProgramScoreRequest):
+    try:
+        return score_program(
+            req.tuition,
+            req.living_cost_per_year,
+            req.duration_years,
+            req.opportunity_cost_per_year,
+            req.expected_annual_premium,
+            req.horizon_years,
+            req.routine,
+            req.social,
+            req.physical,
+            req.licensed,
+            req.current_automation,
+        )
+    except ScoreError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 @router.post("/generate/cover-letter", response_model=GenerateResponse)
 async def create_cover_letter(req: CoverLetterRequest):

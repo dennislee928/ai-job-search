@@ -10,8 +10,8 @@ def init_qdrant():
     client = QdrantClient(host=qdrant_host, port=qdrant_port)
     
     collections = [
-        {"name": "job_descriptions", "size": 1536}, # e.g. for OpenAI embeddings
-        {"name": "resumes", "size": 1536}
+        {"name": "program_descriptions", "size": 384},
+        {"name": "resumes", "size": 384}
     ]
     
     for coll in collections:

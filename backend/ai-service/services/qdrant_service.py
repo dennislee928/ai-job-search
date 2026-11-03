@@ -28,7 +28,7 @@ class QdrantService:
     def search_jobs(self, query: str, limit: int = 5):
         vector = embeddings_service.embed_text(query)
         results = self.client.search(
-            collection_name="job_descriptions",
+            collection_name="program_descriptions",
             query_vector=vector,
             limit=limit
         )
@@ -37,7 +37,7 @@ class QdrantService:
     def match_resume_to_jobs(self, resume_text: str, limit: int = 5):
         vector = embeddings_service.embed_text(resume_text)
         results = self.client.search(
-            collection_name="job_descriptions",
+            collection_name="program_descriptions",
             query_vector=vector,
             limit=limit
         )
